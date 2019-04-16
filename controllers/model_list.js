@@ -9,8 +9,14 @@ const model_list = async function(req, res) {
         status: 200
     };
     try {
+        console.log("post on list");
+        console.log(req.session.isLogin);
+        // if (!req.session.isLogin) {
+        //     responseData.error = "用户没有登录";
+        //     return res.json(responseData);
+        // }
+        // console.log(req.cookies)
         const list = await getListAsync();
-        // console.log(list);
         responseData.data.list = list;
         return res.json(responseData);
     } catch (error) {

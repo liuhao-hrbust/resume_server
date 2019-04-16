@@ -9,9 +9,8 @@ const user_regist = async function(req, res) {
         error: "",
         status: 200
     };
-    console.log(req.body);
+    const { user_name, user_password } = req.body;
     const User = req.body;
-    const { user_name, user_password } = User;
 
     // 验证用户是否已经注册
     try {
@@ -23,9 +22,11 @@ const user_regist = async function(req, res) {
         }
 
         // 新建用户
-        User.user_password = md5(md5(user_password) + "meirenjie");
+        console.log(md5(md5(user_password) + 'meirenjie'));
+        User.user_password = md5(md5(user_password) + 'meirenjie');
         const newUser = new UserModel(User);
-        newUser.save(function(err, data) {
+
+        await newUser.save(function(err, data) {
             if (err) {
                 responseData.status = "00001";
                 responseData.error = "mongodb system error";
@@ -36,7 +37,8 @@ const user_regist = async function(req, res) {
             return res.json(responseData);
         });
     } catch (error) {
-        responseData.error = error;
+        console.log(error);
+        responseData.error = 'e';
         return res.json(responseData);
     }
 };
