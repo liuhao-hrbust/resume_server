@@ -49,16 +49,16 @@ const user_regist = async function(req, res) {
  * describe: findUserAsyc
  **/
 const findUserAsyc = async function(cnd) {
-    console.log(
-        "controllers/UserController.js/findUserAsyc start --> " +
-            JSON.stringify(cnd)
-    );
+    // console.log(
+    //     "controllers/UserController.js/findUserAsyc start --> " +
+    //         JSON.stringify(cnd)
+    // );
     return new Promise(function(resolve, reject) {
         UserModel.findOne(cnd, function(error, data) {
-            console.log(
-                "controllers/UserController.js/findUserAsyc findOne  data --> " +
-                    JSON.stringify(data)
-            );
+            // console.log(
+            //     "controllers/UserController.js/findUserAsyc findOne  data --> " +
+            //         JSON.stringify(data)
+            // );
             if (error) {
                 console.log(error);
                 return reject(error);

@@ -25,6 +25,7 @@ const user_login = async function(req, res) {
             return res.json(responseData);
         } else {
             req.session.isLogin = true;
+            req.session.userName = user_name;
             responseData.msg = "登录成功！";
             responseData.code = 0;
             return res.json(responseData);

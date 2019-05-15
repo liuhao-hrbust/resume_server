@@ -10,7 +10,7 @@ const model_list = async function(req, res) {
     };
     try {
         console.log("post on list");
-        console.log(req.session.isLogin);
+        // console.log(req.session);
         // if (!req.session.isLogin) {
         //     responseData.error = "用户没有登录";
         //     return res.json(responseData);
