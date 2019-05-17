@@ -63,6 +63,10 @@ const resumeSchema = new Schema({
         type: String,
         default: ""
     },
+    self_val:  {
+        type: String,
+        default: ""
+    },
     created_time: {
         type: Date,
         // 注意：这里不要写 Date.now() 因为会即刻调用

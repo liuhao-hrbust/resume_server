@@ -1,6 +1,21 @@
 const ResumeModel = require("../model/member_resume/member_resume");
 
+function loginCheck(req, res) {
+    const responseData = {
+        code: 0,
+        data: {},
+        msg: "",
+        error: "",
+        status: 200
+    };
+    if (!req.session.isLogin) {
+        responseData.error = "用户没有登录";
+        responseData.status = 400;
+        return res.json(responseData);
+    }
+}
 const saveResume = async function(req, res) {
+    // loginCheck(req, res);
     const responseData = {
         code: 0,
         data: {},
@@ -9,11 +24,6 @@ const saveResume = async function(req, res) {
         status: 200
     };
     try {
-        // if (!req.session.isLogin) {
-        //     responseData.error = "用户没有登录";
-        //     responseData.status = 500;
-        //     return res.json(responseData);
-        // }
         // const { userName } = req.session;
         const { resumeId } = req.body;
         const userName = "asd";
@@ -28,6 +38,7 @@ const saveResume = async function(req, res) {
             const newResume = new ResumeModel(params);
             await newResume.save(function(err, data) {
                 if (err) {
+                    console.log(err);
                     responseData.status = "00001";
                     responseData.error = "mongodb system error";
                     return res.json(responseData);
@@ -46,10 +57,9 @@ const saveResume = async function(req, res) {
                         responseData.error = "mongodb system error";
                         console.log("err");
                         return res.json(responseData);
-                    } else {
-                        responseData.msg = "简历保存成功";
-                        return res.json(responseData);
                     }
+                    responseData.msg = "简历保存成功";
+                    return res.json(responseData);
                 }
             );
         }
@@ -61,6 +71,7 @@ const saveResume = async function(req, res) {
 };
 
 const getResumeList = async function(req, res) {
+    // loginCheck(req, res);
     const responseData = {
         code: 0,
         data: {},
@@ -69,19 +80,43 @@ const getResumeList = async function(req, res) {
         status: 200
     };
     try {
-        // console.log(req.session);
-        // if (!req.session.isLogin) {
-        //     responseData.error = "用户没有登录";
-        //     return res.json(responseData);
-        // }
         // console.log(req.cookies)
-        const userName = 'asd';
-        const list = await getResume({userInfo: userName});
+        const userName = "asd";
+        const list = await getResume({ userInfo: userName });
         responseData.data.list = list;
         return res.json(responseData);
     } catch (error) {
         responseData.status = 500;
         responseData.error = error;
+        return res.json(responseData);
+    }
+};
+
+const getTargetResume = async function(req, res) {
+    // loginCheck(req, res);
+    const responseData = {
+        code: 0,
+        data: {},
+        msg: "",
+        error: "",
+        status: 200
+    };
+    try {
+        // const { userName } = req.session;
+        const { resumeId } = req.body;
+        console.log(resumeId);
+        const userName = "asd";
+        const targetResume = await getResume({ userInfo: userName, resumeId });
+        if (targetResume.length === 0) {
+            responseData.data.resume = null;
+            return res.json(responseData);
+        } else {
+            responseData.data.resume = targetResume[0];
+            return res.json(responseData);
+        }
+    } catch (error) {
+        responseData.status = 500;
+        responseData.error = "sadsad";
         return res.json(responseData);
     }
 };
@@ -106,5 +141,6 @@ const getResume = async function(cnd) {
 
 module.exports = {
     saveResume,
-    getResumeList
+    getResumeList,
+    getTargetResume
 };
