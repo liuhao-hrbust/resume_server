@@ -67,6 +67,10 @@ const resumeSchema = new Schema({
         type: String,
         default: ""
     },
+    head_path: {
+        type: String,
+        default: "http://127.0.0.1:3000/images/logo.png"
+    },
     created_time: {
         type: Date,
         // 注意：这里不要写 Date.now() 因为会即刻调用

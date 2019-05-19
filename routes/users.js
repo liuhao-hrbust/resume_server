@@ -11,7 +11,8 @@ const resumeHeadCtrl = require("../controllers/resumeHeadController");
 var storage = multer.diskStorage({
     destination: path.join(process.cwd(), "public/images", "uploads"),
     filename: function(req, file, cb) {
-        cb(null, `${req.session.userName}^${req.session.resumeId}^${file.originalname}`);
+        const fileFormat = (file.originalname).split(".");
+        cb(null, `${req.session.userName}^${req.session.resumeId}^${Date.now()}.${fileFormat[fileFormat.length - 1]}`);
     }
 });
 var upload = multer({ storage });
@@ -30,7 +31,7 @@ router.post("/getTargetResume.do", resumeCtrl.getTargetResume);
 router.post(
     "/uploadHead.do",
     upload.single("imageFile"),
-    resumeHeadCtrl.uploadHead
+    resumeCtrl.uploadHead
 );
 router.post("/createNewResumeId.do", resumeCtrl.createNewResumeId);
 module.exports = router;

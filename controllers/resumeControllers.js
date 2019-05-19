@@ -1,4 +1,5 @@
 const ResumeModel = require("../model/member_resume/member_resume");
+const path = require('path');
 
 function loginCheck(req, res) {
     const responseData = {
@@ -14,7 +15,7 @@ function loginCheck(req, res) {
         return res.json(responseData);
     }
 }
-const saveResume = async function (req, res) {
+const saveResume = async function(req, res) {
     // loginCheck(req, res);
     const responseData = {
         code: 0,
@@ -25,18 +26,22 @@ const saveResume = async function (req, res) {
     };
     try {
         // const { userName } = req.session;
-        const {resumeId} = req.body;
+        const { resumeId } = req.body;
         const userName = "asd";
-        const resume = await getResume({userInfo: userName});
+        const resume = await getResume({ userInfo: userName });
         console.log(resume.length);
-        const targetResume = await getResume({userInfo: userName, resumeId});
+        const targetResume = await getResume({ userInfo: userName, resumeId });
         const params = req.body;
         params.userInfo = userName;
         if (!targetResume.length) {
             // 是新建的简历
             params.resumeId = resume.length + 1;
+            if (req.session.headInfo) {
+                console.log(req.session.headInfo.head_path);
+                params.head_path = req.session.headInfo.path;
+            }
             const newResume = new ResumeModel(params);
-            await newResume.save(function (err, data) {
+            await newResume.save(function(err, data) {
                 if (err) {
                     console.log(err);
                     responseData.status = "00001";
@@ -48,19 +53,23 @@ const saveResume = async function (req, res) {
             });
         } else {
             // 修改
-            ResumeModel.update({
-                userInfo: userName,
-                resumeId
-            }, params, (err, data) => {
-                if (err) {
-                    responseData.status = "00001";
-                    responseData.error = "mongodb system error";
-                    console.log("err");
+            ResumeModel.update(
+                {
+                    userInfo: userName,
+                    resumeId
+                },
+                params,
+                (err, data) => {
+                    if (err) {
+                        responseData.status = "00001";
+                        responseData.error = "mongodb system error";
+                        console.log("err");
+                        return res.json(responseData);
+                    }
+                    responseData.msg = "简历保存成功";
                     return res.json(responseData);
                 }
-                responseData.msg = "简历保存成功";
-                return res.json(responseData);
-            });
+            );
         }
     } catch (error) {
         responseData.status = 500;
@@ -69,7 +78,7 @@ const saveResume = async function (req, res) {
     }
 };
 
-const getResumeList = async function (req, res) {
+const getResumeList = async function(req, res) {
     // loginCheck(req, res);
     const responseData = {
         code: 0,
@@ -81,7 +90,7 @@ const getResumeList = async function (req, res) {
     try {
         // console.log(req.cookies)
         const userName = "asd";
-        const list = await getResume({userInfo: userName});
+        const list = await getResume({ userInfo: userName });
         responseData.data.list = list;
         return res.json(responseData);
     } catch (error) {
@@ -91,7 +100,7 @@ const getResumeList = async function (req, res) {
     }
 };
 
-const getTargetResume = async function (req, res) {
+const getTargetResume = async function(req, res) {
     // loginCheck(req, res);
     const responseData = {
         code: 0,
@@ -102,11 +111,11 @@ const getTargetResume = async function (req, res) {
     };
     try {
         // const { userName } = req.session;
-        const {resumeId} = req.body;
+        const { resumeId } = req.body;
         req.session.resumeId = resumeId;
         // console.log(resumeId);
         const userName = "asd";
-        const targetResume = await getResume({userInfo: userName, resumeId});
+        const targetResume = await getResume({ userInfo: userName, resumeId });
         if (targetResume.length === 0) {
             responseData.data.resume = null;
             return res.json(responseData);
@@ -122,7 +131,7 @@ const getTargetResume = async function (req, res) {
 };
 
 function uploadHead(req, res) {
-    console.log(req.session.resumeId);
+
     // 读取上传的图片信息
     var file = req.file;
     // 设置返回结果
@@ -132,15 +141,21 @@ function uploadHead(req, res) {
         result.errMsg = "上传失败";
     } else {
         result.code = 0;
+        const filePath = 'http://127.0.0.1:3000/images/uploads/' + file.path.split('\\')[file.path.split('\\').length - 1];
         result.data = {
-            url: file.path
+            url: filePath
+        };
+        req.session.headInfo = {
+            resumeId: req.session.resumeId,
+            path: filePath
         };
         result.errMsg = "上传成功";
     }
-    res.send(result);
+    return res.send(result);
 }
 function createNewResumeId(req, res) {
     req.session.resumeId = req.body.resumeId;
+    req.session.headInfo = null;
     const responseData = {
         code: 0,
         data: {},
@@ -155,15 +170,14 @@ function createNewResumeId(req, res) {
  * return:  model_list
  * describe: getListAsync
  **/
-const getResume = async function (cnd) {
-    return new Promise(function (resolve, reject) {
-        ResumeModel
-            .find(cnd, function (error, data) {
-                if (error) {
-                    return reject(error);
-                }
-                return resolve(data);
-            });
+const getResume = async function(cnd) {
+    return new Promise(function(resolve, reject) {
+        ResumeModel.find(cnd, function(error, data) {
+            if (error) {
+                return reject(error);
+            }
+            return resolve(data);
+        });
     });
 };
 
