@@ -25,9 +25,9 @@ const saveResume = async function(req, res) {
         status: 200
     };
     try {
-        // const { userName } = req.session;
+        const { userName } = req.session;
         const { resumeId } = req.body;
-        const userName = "asd";
+        // const userName = session.user.userName;
         const resume = await getResume({ userInfo: userName });
         console.log(resume.length);
         const targetResume = await getResume({ userInfo: userName, resumeId });
@@ -89,7 +89,7 @@ const getResumeList = async function(req, res) {
     };
     try {
         // console.log(req.cookies)
-        const userName = "asd";
+        const { userName } = req.session;
         const list = await getResume({ userInfo: userName });
         responseData.data.list = list;
         return res.json(responseData);
@@ -110,11 +110,11 @@ const getTargetResume = async function(req, res) {
         status: 200
     };
     try {
-        // const { userName } = req.session;
+        const { userName } = req.session;
         const { resumeId } = req.body;
         req.session.resumeId = resumeId;
         // console.log(resumeId);
-        const userName = "asd";
+        // const userName = "asd";
         const targetResume = await getResume({ userInfo: userName, resumeId });
         if (targetResume.length === 0) {
             responseData.data.resume = null;

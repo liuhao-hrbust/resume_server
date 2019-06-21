@@ -25,6 +25,7 @@ router.post("/login.do", loginCtrl.user_login);
 
 router.post("/model_list.do", modelCtrl.model_list);
 router.post("/register.do", userCtrl.user_regist);
+router.post("/changeAccount.do", userCtrl.change_account);
 router.post("/saveResume.do", resumeCtrl.saveResume);
 router.post("/getResumeList.do", resumeCtrl.getResumeList);
 router.post("/getTargetResume.do", resumeCtrl.getTargetResume);

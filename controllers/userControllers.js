@@ -22,7 +22,6 @@ const user_regist = async function(req, res) {
         }
 
         // 新建用户
-        console.log(md5(md5(user_password) + 'meirenjie'));
         User.user_password = md5(md5(user_password) + 'meirenjie');
         const newUser = new UserModel(User);
 
@@ -42,6 +41,52 @@ const user_regist = async function(req, res) {
         return res.json(responseData);
     }
 };
+
+const change_account = async function(req, res) {
+    const responseData = {
+        code: 0,
+        data: {},
+        msg: "",
+        error: "",
+        status: 200
+    };
+    const { user_name, user_password, nuser_password } = req.body;
+    const params = {user_name, user_password: md5(md5(nuser_password) + "meirenjie")};
+
+    try {
+        const user = await findUserAsyc({
+            user_name,
+            user_password: md5(md5(user_password) + "meirenjie")
+        });
+
+        if (!user) {
+            responseData.status = "00002";
+            responseData.error = "用户名或密码输入错误";
+            return res.json(responseData);
+        } else {
+            UserModel.update({
+                user_name
+            },
+            params,
+            (err, data) => {
+                if (err) {
+                    responseData.status = "00001";
+                    responseData.error = "mongodb system error";
+                    console.log("err");
+                    return res.json(responseData);
+                }
+                responseData.status = "00008";
+                responseData.msg = "密码修改成功";
+                return res.json(responseData);
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        responseData.error = error;
+        return res.json(responseData);
+    }
+};
+
 
 /**
  * params:  {cnd}:user find condition
@@ -69,5 +114,6 @@ const findUserAsyc = async function(cnd) {
 };
 
 module.exports = {
-    user_regist
+    user_regist,
+    change_account
 };
